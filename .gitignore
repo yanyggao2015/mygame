@@ -1,2 +1,26 @@
 # Fully Completely (added by scripts/install.js)
 docs/sprints/.locks/
+
+# Node / npm
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# Env files with real values (only .env.example is committed)
+.env*
+!.env.example
+
+# Editor / OS
+.DS_Store

@@ -288,10 +288,64 @@ that doesn't apply.
 
 ## Project standards
 
-Add your own project-specific standards below this line (tech stack,
-domain type locations, error handling conventions, git strategy, testing
-requirements, security baseline). Every agent above should read this file
-before starting work, so keep it current.
+**Stack.** Next.js (App Router) + TypeScript in `strict` mode (see
+`tsconfig.json`; `noUncheckedIndexedAccess` is also on). React 19. No CSS
+framework yet — plain CSS in `app/globals.css` until a real screen needs
+more.
+
+**Directory conventions.**
+- `app/` — routes (App Router). `app/api/<name>/route.ts` for route
+  handlers. Colocate a route's test next to it (`route.test.ts`).
+- `lib/` — shared, framework-agnostic logic (e.g. `lib/build-info.ts`).
+  Colocate tests next to source (`*.test.ts`).
+- Domain types live alongside the code that owns them until enough
+  sprints exist to justify a shared `types/` directory — don't
+  redefine a type another module already exports, import it instead.
+
+**Commands.**
+- `npm run dev` — local dev server.
+- `npm run typecheck` — `tsc --noEmit`, must exit zero.
+- `npm run lint` — `eslint .` (flat config, `eslint.config.mjs`,
+  extends `next/core-web-vitals` + `next/typescript`), must exit zero.
+- `npm test` — `vitest run`. Every test must assert real behavior (a
+  render, a response body, a fallback branch) — no placeholder
+  `true === true` assertions.
+- `npm run build` — production build. Vercel runs this automatically on
+  push to `main`; there is no separate GitHub Actions deploy step (see
+  `.github/workflows/ci.yml`, which runs typecheck/lint/test on every
+  push and PR but does not deploy — Vercel's own GitHub integration owns
+  deploys).
+
+**Live URL:** https://mygame.vercel.app
+
+**Build identifier.** Every deploy exposes a build identifier (short
+commit SHA on Vercel, a build timestamp otherwise) from
+`lib/build-info.ts`, rendered on the root page and returned by
+`GET /api/health`. Both read the same function so they can never
+disagree — if you add a new place that needs to show "which build is
+this," import `getBuildId` rather than reading `process.env` directly.
+
+**Secrets / environment variables.** Nothing this app reads server-side
+may be named with a `NEXT_PUBLIC_` prefix, and nothing that reads a
+secret may be importable from a Client Component — mark server-only
+modules with `import "server-only";` at the top (see
+`lib/build-info.ts` for the pattern, even though today it holds no
+secret). Every environment variable the app reads must be listed in
+`.env.example` with a placeholder value; real values live only in
+`.env*` files, which are git-ignored (except `.env.example` itself,
+explicitly un-ignored in `.gitignore`).
+
+**Testing.** Vitest + `@testing-library/react`, jsdom environment
+(`vitest.config.ts`). Tests are colocated with source, not in a
+separate top-level `tests/` tree.
+
+**Error handling.** Wrap and rethrow rather than swallow; no bare
+`catch` blocks that discard the error. (No error-prone I/O exists yet
+as of Sprint 1 — this is the convention for when it lands.)
+
+**Git strategy.** Trunk-based: feature work happens on sprint branches
+per the Fully Completely lifecycle above; Pipeman is the only role that
+pushes to `main`, and Vercel deploys `main` on every push.
 
 **This is Fully Completely, not Maestro.** The machine running this may also
 have a separate, unrelated sprint-workflow product called Maestro installed

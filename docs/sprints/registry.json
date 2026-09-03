@@ -1,0 +1,29 @@
+{
+  "next_id": 5,
+  "sprints": {
+    "1": {
+      "title": "App scaffold, CI, and live deploy pipeline",
+      "epic": "Foundation",
+      "status": "in_progress",
+      "file": "docs/sprints/2-in-progress/sprint-1_app-scaffold-ci-and-live-deploy-pipeline.md"
+    },
+    "2": {
+      "title": "Symbolic math core: solver and answer equivalence",
+      "epic": "Trustworthy Problem Generation",
+      "status": "todo",
+      "file": "docs/sprints/1-todo/sprint-2_symbolic-math-core-solver-and-answer-equivalence.md"
+    },
+    "3": {
+      "title": "Household account and authentication",
+      "epic": "Parent Account and Visibility",
+      "status": "todo",
+      "file": "docs/sprints/1-todo/sprint-3_household-account-and-authentication.md"
+    },
+    "4": {
+      "title": "Verified problem generation pipeline",
+      "epic": "Trustworthy Problem Generation",
+      "status": "todo",
+      "file": "docs/sprints/1-todo/sprint-4_verified-problem-generation-pipeline.md"
+    }
+  }
+}
