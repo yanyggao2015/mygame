@@ -1,6 +1,6 @@
 # MyGame
 
-**Live:** https://mygame.vercel.app
+**Live:** https://mygame-black-mu.vercel.app
 
 A Next.js (App Router) + TypeScript application. This repository is built
 and shipped through the Fully Completely sprint lifecycle — see

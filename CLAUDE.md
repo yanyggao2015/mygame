@@ -316,7 +316,7 @@ more.
   push and PR but does not deploy — Vercel's own GitHub integration owns
   deploys).
 
-**Live URL:** https://mygame.vercel.app
+**Live URL:** https://mygame-black-mu.vercel.app
 
 **Build identifier.** Every deploy exposes a build identifier (short
 commit SHA on Vercel, a build timestamp otherwise) from
