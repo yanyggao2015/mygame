@@ -1,13 +1,13 @@
 {
   "id": 1,
   "title": "App scaffold, CI, and live deploy pipeline",
-  "phase": "dev_build",
-  "qa1_audit_result": null,
-  "qa1_audit_file_hash": null,
-  "qa1_audited_tree_hash": null,
-  "last_shipped_commit": null,
+  "phase": "liveqa_live",
+  "qa1_audit_result": "PASS",
+  "qa1_audit_file_hash": "58d820fa6416451079ab890d566e2177137e303d5f4dd1c2728b21966f1683cc",
+  "qa1_audited_tree_hash": "e567ab5c99158c5da26c871bf1bf44a63867bbd6",
+  "last_shipped_commit": "fe7f2dba3d67305158c94ccdf5b62bc9ff8b7dd7",
   "groundtruth_result": null,
-  "audit_rounds": 0,
+  "audit_rounds": 1,
   "live_test_rounds": 0,
   "started": "2026-09-03T04:04:43+00:00",
   "completed": null,
@@ -17,6 +17,24 @@
       "actor": "system",
       "event": "sprint_started",
       "detail": ""
+    },
+    {
+      "ts": "2026-09-03T04:22:51+00:00",
+      "actor": "qa1",
+      "event": "audit",
+      "detail": "PASS: AUDITED COMMIT fe7f2db (clean tree; audited content == committed content). Sprint file re-read fresh from docs/sprints/2-in-progress/ immediately before this verdict.\n\nVERIFIED BY EXECUTION, NOT BY READING:\n- Clean checkout of fe7f2db extracted via git archive, npm ci (exit 0, 0 vulnerabilities), then CI order: typecheck exit 0, lint exit 0, test exit 0 (4 files / 9 assertions). Also confirmed next-env.d.ts is gitignored and ABSENT from a clean checkout, and typecheck still passes without it - CI runs typecheck before build, so that ordering was a real risk and it holds.\n- Req 5/6 mechanism PROVEN, this was the one non-obvious decision and Dev asked for scrutiny. Build output confirms the premise: / is Static (o), /api/health is Dynamic (f). Built with VERCEL_GIT_COMMIT_SHA=abcdef12..., then started the server with the env var UNSET at runtime: page rendered abcdef1 and /api/health returned abcdef1. Inline reaches both a prerendered page and a dynamic Route Handler with zero runtime env.\n- FALSIFICATION TEST: built with NO VERCEL_GIT_COMMIT_SHA to exercise the new Date().toISOString() fallback, on the theory that next.config.ts loading more than once per build would give page and API different timestamps - reintroducing the same bug in the fallback branch. Hypothesis FALSIFIED: both returned 2026-09-03T04:20:06.464Z. Config loads once, value inlined once. Fallback branch is sound.\n- COUNTERFACTUAL: rebuilt with getBuildId() reading process.env.VERCEL_GIT_COMMIT_SHA directly (the approach Dev rejected). Page served abcdef1, API served dev-local. MISMATCH. The bug is real, the fix is earned complexity, not over-engineering. This is exactly the sprint's named risk (green deploy serving a stale build) and exactly what LiveQA's matching criterion would have caught in production.\n\nREQUIREMENTS: 1 MET (strict + noUncheckedIndexedAccess, tsc clean). 2 MET (vitest, 9 real assertions on fallback logic/response shape/render, no true===true). 3 MET (flat config, clean). 4 PARTIAL-BY-DESIGN (URL in README.md:3; actual deploy wiring is not statically verifiable and is deferred to LiveQA's third criterion). 5 MET. 6 MET. 7 MET (server-only marker, no NEXT_PUBLIC_ anywhere, no client components at all, .env* ignored with .env.example un-ignored). 8 MET (placeholder line gone, standards describe what was actually built).\n\nFINDINGS - NONE BLOCKING:\n1. [MEDIUM, FORWARD-LOOKING] next.config.ts's env block bypasses BOTH documented secret protections. CLAUDE.md's secrets convention is server-only + no NEXT_PUBLIC_ prefix, but env: in next.config inlines into any bundle that references the value, regardless of variable name and regardless of the server-only marker. Verified NEXT_BUILD_ID does NOT currently leak (grep of .next/static is empty) - but only because it is referenced solely from a server-only module. Req 7 exists specifically to set the pattern before Sprint 4 lands an LLM API key, and the convention as written does not cover the mechanism this sprint just introduced. Add a line to CLAUDE.md's secrets section: never put a secret in next.config.ts's env block. Cheap now, expensive in Sprint 4.\n2. [LOW] .env.example never names NEXT_BUILD_ID, which lib/build-info.ts:22 actually reads. The acceptance criterion says every variable the code reads, not a subset. It is build-injected rather than user-supplied so a placeholder line would mislead, but a named prose entry costs one line.\n3. [LOW] The getBuildId unit tests exercise runtime process.env reads; production uses build-time inlining. Those tests structurally CANNOT catch a failure of the inlining mechanism the whole design rests on. Not a defect - but nobody should read those 9 green assertions as covering Req 5/6's real invariant. My build-and-serve runs cover it now; LiveQA's page-vs-API match is the durable gate.\n4. [INFO] Lint ignores scripts/**. Verified legitimate, not hidden app defects: unignoring produces 27 errors, all no-require-imports on pre-existing CommonJS launcher tooling that predates this sprint. Correct call. Note that scripts/ is now lint-uncovered.\n5. [INFO] Next 15->16.3.4 and Vitest 2->4 major bumps made unprompted to clear 7 vulns. Disclosed honestly by Dev, 0 vulns confirmed on clean npm ci. Next 16 is new; acceptable on a scaffold sprint where nothing depends on it yet.\n\nSCOPE: clean. No math, auth, or DB. globals.css is legibility-only, within bounds. No unrequested feature code.\nERROR HANDLING: no I/O exists yet, no bare catches, nothing swallowed. N/A this sprint.\nSECURITY: no secrets, no user input, no injection surface, all server components.\n\nThe build-id reasoning Dev flagged for scrutiny is correct and I proved it three ways. Ship it."
+    },
+    {
+      "ts": "2026-09-03T04:24:09+00:00",
+      "actor": "dev-team",
+      "event": "dev_agreed_done",
+      "detail": ""
+    },
+    {
+      "ts": "2026-09-03T04:26:47+00:00",
+      "actor": "pipeman",
+      "event": "shipped",
+      "detail": "commit=fe7f2db"
     }
   ]
 }
